@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/departments")
 public class DepartmentController {
@@ -24,5 +26,23 @@ public class DepartmentController {
     @GetMapping("{id}")
     public ResponseEntity<DepartmentDto> getDepartmentById(@PathVariable("id") Long departmentId) {
        return ResponseEntity.ok(departmentService.getDepartmentById(departmentId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<DepartmentDto>> getAllDepartments() {
+        return ResponseEntity.ok(departmentService.getAllDepartments());
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity<DepartmentDto> updateDepartment(@RequestBody DepartmentDto departmentDto,
+                                          @PathVariable("id") Long departmentId) {
+        DepartmentDto updatedDepartment=departmentService.updateDepartment(departmentDto,departmentId);
+        return ResponseEntity.ok(updatedDepartment);
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<String> deleteDepartment(@PathVariable("id") Long departmentId) {
+        departmentService.deleteDepartment(departmentId);
+        return ResponseEntity.ok("Department Deleted Successfully");
     }
 }
