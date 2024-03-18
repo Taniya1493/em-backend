@@ -1,10 +1,13 @@
 package com.employee.emsbackend.service.impl;
 
 import com.employee.emsbackend.dto.EmployeeDto;
+import com.employee.emsbackend.entity.Department;
 import com.employee.emsbackend.entity.Employee;
 import com.employee.emsbackend.exception.ResourceNotFoundException;
+import com.employee.emsbackend.repository.DepartmentRepository;
 import com.employee.emsbackend.repository.EmployeeRepository;
 import com.employee.emsbackend.service.EmployeeService;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -12,19 +15,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
     private EmployeeRepository employeeRepository;
+
+    private DepartmentRepository departmentRepository;
     private ModelMapper modelMapper;
 
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository, ModelMapper modelMapper) {
-        this.employeeRepository = employeeRepository;
-        this.modelMapper = modelMapper;
-    }
 
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
         Employee employee=modelMapper.map(employeeDto, Employee.class);
+
+        Department department=departmentRepository.findById(employeeDto.getDepartmentId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Department not exists with ","id: ", employeeDto.getDepartmentId()));
+        employee.setDepartment(department);
+
         Employee savedEmployee=employeeRepository.save(employee);
         return modelMapper.map(savedEmployee,EmployeeDto.class);
     }
@@ -52,6 +60,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         employee.setFirstName(employeeDto.getFirstName());
         employee.setLastName(employeeDto.getLastName());
         employee.setEmail(employeeDto.getEmail());
+
+        Department department=departmentRepository.findById(employeeDto.getDepartmentId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Department not exists with ","id: ", employeeDto.getDepartmentId()));
+        employee.setDepartment(department);
 
         Employee updatedEmployee=employeeRepository.save(employee);
 
